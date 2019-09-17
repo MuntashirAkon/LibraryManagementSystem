@@ -341,3 +341,139 @@ function delete_issue($mysql, $iss_no){
     }
     return false;
 }
+
+/* Question 3 */
+
+/**
+ * @param Mysqli $mysql
+ * @param string $date
+ * @return array
+ */
+function question_3($mysql, $date){
+    $info = [];
+    if($stmt = $mysql->prepare('SELECT Student.stud_no, stud_name, book_name, author FROM Student, Membership, Book, Iss_rec WHERE Student.stud_no = Membership.stud_no AND Membership.mem_no = Iss_rec.mem_no AND Iss_rec.book_no = Book.book_no AND Iss_rec.iss_date = ?')){
+        $stmt->bind_param('s', $date);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            for($i = 0; $i < $stmt->num_rows; ++$i){
+                $stmt->bind_result($no, $std_name, $book_name, $author);
+                $stmt->fetch();
+                array_push($info, ['no' => $no, 'std_name' => $std_name, 'book_name' => $book_name, 'author' => $author]);
+            }
+        }
+    }
+    return $info;
+}
+
+/* Question 4 */
+
+/**
+ * @param Mysqli $mysql
+ * @return array
+ */
+function question_4($mysql){
+    $info = [];
+    if($stmt = $mysql->prepare('SELECT Student.stud_no, stud_name, book_name, author FROM Student, Membership, Book, Iss_rec WHERE Student.stud_no = Membership.stud_no AND Membership.mem_no = Iss_rec.mem_no AND Iss_rec.book_no = Book.book_no AND Book.author = \'Andrew S. Tanenbaum\'')){
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            for($i = 0; $i < $stmt->num_rows; ++$i){
+                $stmt->bind_result($no, $std_name, $book_name, $author);
+                $stmt->fetch();
+                array_push($info, ['no' => $no, 'std_name' => $std_name, 'book_name' => $book_name, 'author' => $author]);
+            }
+        }
+    }
+    return $info;
+}
+
+/* Question 5 */
+
+/**
+ * @param Mysqli $mysql
+ * @return array
+ */
+function question_5($mysql){
+    $info = [];
+    if($stmt = $mysql->prepare('SELECT Student.stud_no, stud_name, COUNT(*) AS books FROM Student, Membership, Iss_rec WHERE Student.stud_no = Membership.stud_no AND Membership.mem_no = Iss_rec.mem_no GROUP BY Student.stud_no, stud_name')){
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            for($i = 0; $i < $stmt->num_rows; ++$i){
+                $stmt->bind_result($no, $std_name, $count);
+                $stmt->fetch();
+                array_push($info, ['no' => $no, 'name' => $std_name, 'count' => $count]);
+            }
+        }
+    }
+    return $info;
+}
+
+/* Question 6 */
+
+/**
+ * @param Mysqli $mysql
+ * @return array
+ */
+function question_6($mysql){
+    $info = [];
+    if($stmt = $mysql->prepare('SELECT Student.stud_no, stud_name, COUNT(*) AS books FROM Student, Membership, Iss_rec WHERE Student.stud_no = Membership.stud_no AND Membership.mem_no = Iss_rec.mem_no GROUP BY Student.stud_no, stud_name HAVING COUNT(*) = 3;')){
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            for($i = 0; $i < $stmt->num_rows; ++$i){
+                $stmt->bind_result($no, $std_name, $count);
+                $stmt->fetch();
+                array_push($info, ['no' => $no, 'name' => $std_name, 'count' => $count]);
+            }
+        }
+    }
+    return $info;
+}
+
+/* Question 7 */
+
+/**
+ * @param Mysqli $mysql
+ * @param $std_no
+ * @return array
+ */
+function question_7($mysql, $std_no){
+    $info = [];
+    if($stmt = $mysql->prepare('SELECT Student.stud_no, stud_name, book_name, author FROM Student, Membership, Book, Iss_rec WHERE Student.stud_no = Membership.stud_no AND Membership.mem_no = Iss_rec.mem_no AND Iss_rec.book_no = Book.book_no AND Student.stud_no = ?')){
+        $stmt->bind_param('s', $std_no);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            for($i = 0; $i < $stmt->num_rows; ++$i){
+                $stmt->bind_result($no, $std_name, $book_name, $author);
+                $stmt->fetch();
+                array_push($info, ['no' => $no, 'std_name' => $std_name, 'book_name' => $book_name, 'author' => $author]);
+            }
+        }
+    }
+    return $info;
+}
+
+/* Question 8 */
+
+/**
+ * @param Mysqli $mysql
+ * @return array
+ */
+function question_8($mysql){
+    $info = [];
+    if($stmt = $mysql->prepare('SELECT DISTINCT Book.book_no, book_name, author FROM Iss_rec, Book WHERE Iss_rec.book_no = Book.book_no AND Iss_rec.iss_date <= NOW() ORDER BY Book.book_no')){
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            for($i = 0; $i < $stmt->num_rows; ++$i){
+                $stmt->bind_result($no, $name, $author);
+                $stmt->fetch();
+                array_push($info, ['no' => $no, 'name' => $name, 'author' => $author]);
+            }
+        }
+    }
+    return $info;
+}
